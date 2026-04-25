@@ -1,0 +1,74 @@
+name: Feature / new-spec proposal
+description: Propose a new spec or a structural change that doesn't fit an existing spec.
+title: "[proposal] <one-line summary>"
+labels: ["proposal"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        New specs are accepted only when they (a) carry a falsifiable
+        hypothesis, (b) name a numeric metric with a target, and (c)
+        fit the compute envelope in [`specs/00-charter.md`](../specs/00-charter.md).
+
+  - type: textarea
+    id: hypothesis
+    attributes:
+      label: Hypothesis
+      description: One sentence, falsifiable, names the SOTA anchor it improves on.
+      placeholder: |
+        H6: V-JEPA-2-derived predictive embeddings outperform SigLIP-2
+        cosine novelty for moment selection on the yi-dome-pilot-v0
+        benchmark, by >= 0.05 absolute precision@10.
+    validations:
+      required: true
+
+  - type: textarea
+    id: metric
+    attributes:
+      label: Metric and target
+      description: What number on what dataset on what tier?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: relation
+    attributes:
+      label: Relation to existing specs
+      options:
+        - new subsystem (orthogonal to 01-05)
+        - replaces an existing spec
+        - augments an existing spec
+        - cross-cutting (eval / infra)
+    validations:
+      required: true
+
+  - type: input
+    id: existing_spec
+    attributes:
+      label: Affected existing spec_id (if any)
+      placeholder: perception-smart-moment
+
+  - type: textarea
+    id: feasibility
+    attributes:
+      label: Feasibility on the compute envelope
+      description: |
+        Pick one of T0-T3. Cite a measured latency / memory number from
+        a prior project, paper, or upstream report. No "should fit"
+        without a source.
+    validations:
+      required: true
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References (≥ 2 verifiable links)
+    validations:
+      required: true
+
+  - type: input
+    id: agent_id
+    attributes:
+      label: Your agent / contributor id
+    validations:
+      required: true
