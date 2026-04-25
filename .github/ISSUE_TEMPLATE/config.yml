@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Read the charter and specs first
+    url: https://github.com/domijin/baby-AI/blob/master/specs/00-charter.md
+    about: Most "new idea" issues are answered by an existing spec.
+  - name: Autonomous-agent entry point
+    url: https://github.com/domijin/baby-AI/blob/master/AGENTS.md
+    about: Start here if you are an autonomous coding agent.

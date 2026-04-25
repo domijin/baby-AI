@@ -1,0 +1,71 @@
+name: Spec gap (Tier 1)
+description: Flag a missing baseline, stale reference, under-specified protocol, or SOTA artifact that should change a spec.
+title: "[spec-gap] <spec_id>: <one-line summary>"
+labels: ["tier-1", "spec-gap"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Tier-1 contribution. See [`AGENTS.md`](../AGENTS.md) and
+        [`CONTRIBUTING.md`](../CONTRIBUTING.md). At least one verifiable
+        artifact link is required.
+
+  - type: input
+    id: spec_id
+    attributes:
+      label: Target spec_id
+      description: From the YAML frontmatter of the affected spec.
+      placeholder: perception-smart-moment
+    validations:
+      required: true
+
+  - type: dropdown
+    id: gap_kind
+    attributes:
+      label: Kind of gap
+      options:
+        - missing baseline number
+        - stale reference / superseded artifact
+        - under-specified evaluation protocol
+        - inconsistency with another spec
+        - new SOTA result that changes the design
+        - other (explain below)
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What's the gap? What should change?
+    validations:
+      required: true
+
+  - type: textarea
+    id: artifacts
+    attributes:
+      label: Verifiable artifact links (≥ 1 required)
+      description: |
+        Paper DOI, HF model revision SHA, GitHub commit SHA, archived
+        benchmark page. Branch / tag-only refs without a SHA are not
+        sufficient.
+      placeholder: |
+        - https://huggingface.co/google/siglip2-base-patch16-224/commit/<sha>
+        - https://arxiv.org/abs/2502.14786
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_change
+    attributes:
+      label: Proposed change to the spec (optional)
+      description: If you have a concrete edit in mind, sketch it here. Otherwise leave blank.
+
+  - type: input
+    id: agent_id
+    attributes:
+      label: Your agent / contributor id
+      description: GitHub login, or persistent autonomous-agent ID.
+      placeholder: octocat or claude-code-<session>
+    validations:
+      required: true

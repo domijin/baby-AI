@@ -1,0 +1,217 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/domijin/baby-AI/blob/master/receipts/schema.json",
+  "title": "baby-AI evaluation receipt",
+  "description": "A signed, content-addressed claim that a contributor ran a spec's evaluation on stated hardware and got a stated metric value. See specs/05-eval.md.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "spec_id",
+    "spec_version",
+    "agent",
+    "artifact_refs",
+    "hardware",
+    "metric",
+    "seed",
+    "log_uri",
+    "log_sha256",
+    "signature"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "spec_id": {
+      "type": "string",
+      "description": "spec_id from the YAML frontmatter of the targeted spec",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "spec_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "supersedes": {
+      "type": "string",
+      "description": "SHA-256 of a prior receipt this one replaces (e.g. for key rotation or bug-fix re-runs).",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "agent": {
+      "type": "object",
+      "required": ["id", "kind"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable contributor identifier (GitHub login or persistent agent ID)."
+        },
+        "kind": {
+          "enum": ["human", "autonomous", "hybrid"]
+        },
+        "model": {
+          "type": "string",
+          "description": "If kind != human, the LLM that produced this receipt (e.g. claude-opus-4-7, gpt-5)."
+        },
+        "public_key": {
+          "type": "string",
+          "description": "Public key used for the signature, in OpenSSH allowed-signers format."
+        }
+      }
+    },
+    "artifact_refs": {
+      "type": "object",
+      "required": ["code_git_sha"],
+      "additionalProperties": false,
+      "properties": {
+        "code_git_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{7,40}$"
+        },
+        "code_repo": {
+          "type": "string",
+          "format": "uri",
+          "default": "https://github.com/domijin/baby-AI"
+        },
+        "model_repo": {
+          "type": "string",
+          "description": "e.g. HuggingFaceTB/SmolVLM2-2.2B-Instruct"
+        },
+        "model_revision": {
+          "type": "string",
+          "description": "HF revision SHA (NOT just a branch or tag name)."
+        },
+        "adapter_repo": {
+          "type": "string"
+        },
+        "adapter_revision": {
+          "type": "string"
+        },
+        "dataset_uri": {
+          "type": "string",
+          "format": "uri"
+        },
+        "dataset_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "runtime": {
+          "type": "object",
+          "description": "Identifies the inference / training runtime build.",
+          "properties": {
+            "name": {"type": "string"},
+            "version_or_sha": {"type": "string"},
+            "build_flags": {"type": "string"},
+            "quantization": {"type": "string"}
+          },
+          "required": ["name", "version_or_sha"]
+        }
+      }
+    },
+    "hardware": {
+      "type": "object",
+      "required": ["tier", "cpu", "ram_mb", "kernel"],
+      "additionalProperties": false,
+      "properties": {
+        "tier": {
+          "enum": [
+            "T0-yi-dome-hi3518ev200",
+            "T1-rpi5-16gb",
+            "T2-rpi5-16gb-hailo8l",
+            "T3-desktop-gpu",
+            "T?-other"
+          ]
+        },
+        "cpu": {"type": "string"},
+        "ram_mb": {"type": "integer", "minimum": 1},
+        "accelerator": {"type": "string"},
+        "accelerator_driver_version": {"type": "string"},
+        "kernel": {"type": "string"},
+        "tier_other_explanation": {
+          "type": "string",
+          "description": "Required when tier == T?-other."
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"tier": {"const": "T?-other"}}},
+          "then": {"required": ["tier_other_explanation"]}
+        }
+      ]
+    },
+    "metric": {
+      "type": "object",
+      "required": ["name", "value", "unit", "n_samples"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"type": "string"},
+        "value": {"type": "number"},
+        "unit": {"type": "string"},
+        "ci_low": {"type": "number"},
+        "ci_high": {"type": "number"},
+        "ci_method": {
+          "type": "string",
+          "description": "e.g. bootstrap-1000, wilson, normal-approx"
+        },
+        "n_samples": {"type": "integer", "minimum": 1},
+        "additional_metrics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "value", "unit"],
+            "properties": {
+              "name": {"type": "string"},
+              "value": {"type": ["number", "string"]},
+              "unit": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    "seed": {
+      "oneOf": [
+        {"type": "integer"},
+        {"type": "array", "items": {"type": "integer"}}
+      ]
+    },
+    "wallclock_iso": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the evaluation completed (UTC)."
+    },
+    "duration_seconds": {
+      "type": "number",
+      "minimum": 0
+    },
+    "log_uri": {
+      "type": "string",
+      "format": "uri",
+      "description": "Public URL to the full eval log. Hash MUST match log_sha256."
+    },
+    "log_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "signature": {
+      "type": "object",
+      "required": ["scheme", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "scheme": {
+          "enum": ["ssh-sig", "sigstore", "minisign"]
+        },
+        "value": {
+          "type": "string",
+          "description": "Detached signature over the canonicalized receipt body (all fields except 'signature')."
+        },
+        "namespace": {
+          "type": "string",
+          "default": "baby-ai-receipt-v0"
+        }
+      }
+    },
+    "notes": {
+      "type": "string",
+      "description": "Free-form contributor notes. Not part of the verifiability contract."
+    }
+  }
+}

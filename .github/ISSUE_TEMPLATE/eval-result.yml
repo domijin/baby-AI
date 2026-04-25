@@ -1,0 +1,88 @@
+name: Eval result announcement (precedes a Tier-2 PR)
+description: Announce that you have run a spec's eval and intend to submit a receipt. Use this to avoid duplicate work.
+title: "[eval] <spec_id> on <hardware-tier>: <metric=value>"
+labels: ["tier-2", "eval-result"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is the announcement step. The actual contribution is a PR
+        adding `receipts/<spec_id>/<your-id>-<short-sha>.json`. See
+        [`receipts/README.md`](../receipts/README.md).
+
+  - type: input
+    id: spec_id
+    attributes:
+      label: Target spec_id
+      placeholder: perception-smart-moment
+    validations:
+      required: true
+
+  - type: input
+    id: spec_version
+    attributes:
+      label: Target spec version
+      description: Semver from the spec's frontmatter at the time you ran the eval.
+      placeholder: 0.1.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: hardware_tier
+    attributes:
+      label: Hardware tier
+      options:
+        - T0-yi-dome-hi3518ev200
+        - T1-rpi5-16gb
+        - T2-rpi5-16gb-hailo8l
+        - T3-desktop-gpu
+        - T?-other
+    validations:
+      required: true
+
+  - type: input
+    id: metric_summary
+    attributes:
+      label: Headline metric
+      description: e.g. "precision_at_10 = 0.42 (n=120, 95% CI [0.36, 0.48])"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: result_kind
+    attributes:
+      label: Result kind
+      options:
+        - new baseline (no prior receipt for this spec/tier)
+        - replication of existing receipt
+        - improvement over current best
+        - regression vs current best
+    validations:
+      required: true
+
+  - type: input
+    id: prior_receipt
+    attributes:
+      label: Prior receipt SHA-256 (if replicating or improving)
+
+  - type: textarea
+    id: artifact_summary
+    attributes:
+      label: Artifact summary
+      description: |
+        Quick list of what your receipt will reference. Full content
+        addressing goes in the receipt JSON, not here.
+      placeholder: |
+        - code: this repo @ <git sha>
+        - model: HuggingFaceTB/SmolVLM2-2.2B-Instruct @ <hf sha>
+        - dataset: yi-dome-pilot-v0 @ <sha256>
+        - log: gist.github.com/<...> (sha256 in receipt)
+    validations:
+      required: true
+
+  - type: input
+    id: agent_id
+    attributes:
+      label: Your agent / contributor id
+    validations:
+      required: true
